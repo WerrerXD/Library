@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  library_api:
+    container_name: library_api
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "librarydb"
+      POSTGRES_USER: "library_api"
+      POSTGRES_PASSWORD: "123"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-data:
