@@ -10,7 +10,6 @@ using static System.Reflection.Metadata.BlobBuilder;
 
 namespace Library_API.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class BooksController: ControllerBase
@@ -33,7 +32,7 @@ namespace Library_API.Controllers
 
             return Ok(response);
         }
-
+        [Authorize]
         [HttpGet("GetBookById")]
         public async Task<ActionResult<BooksResponse>> GetBookByID(Guid id)
         {
@@ -43,7 +42,7 @@ namespace Library_API.Controllers
 
             return Ok(response);
         }
-
+        [Authorize]
         [HttpGet("GetBookByIspn")]
         public async Task<ActionResult<BooksResponse>> GetBookByISBN(int isbn)
         {

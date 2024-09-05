@@ -1,0 +1,6 @@
+{
+  "projects": [ "Library_API", "test" ],
+  "sdk": {
+    "version": "8.0.303"
+  }
+}

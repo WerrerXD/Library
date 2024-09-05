@@ -7,6 +7,7 @@
 	<InvariantGlobalization>true</InvariantGlobalization>
 	<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<DockerfileContext>.</DockerfileContext>
+	<UserSecretsId>bd9424ee-8eaa-4a2e-aec2-49ac985312d1</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,13 +20,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.NET.Build.Containers" Version="8.0.401" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Library API.Application\Library API.Application.csproj" />
-    <ProjectReference Include="..\Library API.DataAccess\Library API.DataAccess.csproj" />
+    <ProjectReference Include="..\Library_API.Application\Library_API.Application.csproj">
+      <ReferenceOutputAssembly>True</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\Library_API.DataAccess\Library_API.DataAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>
