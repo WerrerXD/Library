@@ -1,5 +1,5 @@
-﻿using Library_API.DataAccess.Configurations;
-using Library_API.DataAccess.Entities;
+﻿using Library_API.Core.Models;
+using Library_API.DataAccess.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +14,11 @@ namespace Library_API.DataAccess
 
         }
         
-       public DbSet<BookEntity> Books { get; set; }
+       public DbSet<Book> Books { get; set; }
 
-       public DbSet<AuthorEntity> Authors { get; set; }
+       public DbSet<Author> Authors { get; set; }
 
-       public DbSet<UserEntity> Users { get; set; }
+       public DbSet<User> Users { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

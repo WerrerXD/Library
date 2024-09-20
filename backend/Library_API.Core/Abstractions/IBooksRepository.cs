@@ -4,7 +4,6 @@ namespace Library_API.DataAccess.Repositories
 {
     public interface IBooksRepository
     {
-        Task<Guid> Create(double isbn, string title, string genre, string description, string authorname, DateOnly datein, DateOnly dateout, Guid authorid);
         Task<Guid> Create2(Book book, Guid authorid);
         Task<Guid> Delete(Guid id);
         Task<List<Book>> Get();

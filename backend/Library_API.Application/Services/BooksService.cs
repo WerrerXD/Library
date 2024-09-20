@@ -26,11 +26,6 @@ namespace Library_API.Application.Services
             return await _booksRepository.GetByISBN(isbn);
         }
 
-        public async Task<Guid> CreateBook(double isbn, string title, string genre, string description, string authorname, DateOnly datein, DateOnly dateout, Guid authorid)
-        {
-            return await _booksRepository.Create(isbn, title, genre, description,authorname, datein, dateout, authorid);
-        }
-
         public async Task<Guid> CreateBook2(Book book, Guid authorid)
         {
             return await _booksRepository.Create2(book, authorid);

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Library_API.Core.Models;
-using Library_API.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.TypeMapping;
 using System;
@@ -23,30 +22,15 @@ namespace Library_API.DataAccess.Repositories
 
         public async Task Add(User user)
         {
-            var userEntity = new UserEntity()
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                PasswordHash = user.PasswordHash,
-                Email = user.Email
-            };
-
-            await _context.Users.AddAsync(userEntity);
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
 
         public async Task<User> GetByEmail(string email)
         {
-            var userEntity = await _context.Users
+            var user = await _context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email == email) ?? throw new Exception("Wrong email");
-
-            var user = User.Create(
-                userEntity.Id,
-                userEntity.UserName,
-                userEntity.PasswordHash,
-                userEntity.Email
-                );
+                .FirstOrDefaultAsync(u => u.Email == email);
 
             return user;
         }
@@ -56,31 +40,13 @@ namespace Library_API.DataAccess.Repositories
             var user = await GetByEmail(email);
 
 
-            var bookEntities = await _context.Books
+            var books = await _context.Books
                 .AsNoTracking()
                 .Where(b => b.UserId == user.Id)
                 .Where(b => b.DateOut.CompareTo(DateOnly.FromDateTime(DateTime.UtcNow)) >= 0)
-                .ToListAsync() ?? throw new Exception("No books were taken");
+                .ToListAsync();
 
-            List<Book> Books = [];
-
-            for (int i = 0; i < bookEntities.Count; i++)
-            {
-                Books.Add(Book.Create(
-                bookEntities[i].Id,
-                bookEntities[i].ISBN,
-                bookEntities[i].Title,
-                bookEntities[i].Genre,
-                bookEntities[i].Description,
-                bookEntities[i].AuthorName,
-                bookEntities[i].DateIn,
-                bookEntities[i].DateOut,
-                bookEntities[i].AuthorId,
-                bookEntities[i].CoverImageUrl
-                ).book);
-                Books[i].UserId = user.Id;
-            }
-            return Books;
+            return books;
         }
 
         public async Task AddBookByISBN(int isbn, string email)
@@ -89,7 +55,7 @@ namespace Library_API.DataAccess.Repositories
 
             var book = await _context.Books
                 .AsNoTracking()
-                .FirstOrDefaultAsync(b => b.ISBN == isbn) ?? throw new Exception("No books with this isbn");
+                .FirstOrDefaultAsync(b => b.ISBN == isbn);
 
             await _context.Books
                 .AsNoTracking()
@@ -107,7 +73,7 @@ namespace Library_API.DataAccess.Repositories
 
             var book = await _context.Books
                 .AsNoTracking()
-                .FirstOrDefaultAsync(b => b.Title == title && b.AuthorName == authorName) ?? throw new Exception("No books with this title and author");
+                .FirstOrDefaultAsync(b => b.Title == title && b.AuthorName == authorName);
 
             await _context.Books
                 .AsNoTracking()

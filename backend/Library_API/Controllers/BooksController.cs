@@ -1,7 +1,7 @@
-﻿using Library_API.Application.Services;
-using Library_API.Contracts;
+﻿using AutoMapper;
+using Library_API.Application.Services;
+using Library_API.Core.Contracts;
 using Library_API.Core.Models;
-using Library_API.DataAccess.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Web.Helpers;
@@ -16,11 +16,13 @@ namespace Library_API.Controllers
     {
         private readonly IBooksService _booksService;
         public static IWebHostEnvironment? _webHostEnvironment;
+        private readonly IMapper _mapper;
 
-        public BooksController(IBooksService booksService, IWebHostEnvironment webHostEnvironment)
+        public BooksController(IBooksService booksService, IWebHostEnvironment webHostEnvironment, IMapper mapper)
         {
             _booksService = booksService;
             _webHostEnvironment = webHostEnvironment;
+            _mapper = mapper;
         }
 
         [HttpGet("getAllBooks")]
@@ -28,7 +30,7 @@ namespace Library_API.Controllers
         {
             var books = await _booksService.GetAllBooks();
 
-            var response = books.Select(b => new BooksResponse(b.Id, b.ISBN, b.Title, b.Genre, b.Description, b.AuthorName, b.DateIn, b.DateOut, b.AuthorId));
+            var response = books.Select(b => _mapper.Map<BooksResponse>(b));
 
             return Ok(response);
         }
@@ -38,7 +40,12 @@ namespace Library_API.Controllers
         {
             var book = await _booksService.GetBookById(id);
 
-            var response = book;
+            if (book == null) 
+            {
+                return NotFound("Wrong Book ID");
+            }
+
+            var response = _mapper.Map<BooksResponse>(book);
 
             return Ok(response);
         }
@@ -48,16 +55,48 @@ namespace Library_API.Controllers
         {
             var book = await _booksService.GetBookByISBN(isbn);
 
-            var response = book;
+
+            if (book == null)
+            {
+                return NotFound("Wrong Book ISBN");
+            }
+
+            var response = _mapper.Map<BooksResponse>(book);
 
             return Ok(response);
         }
 
         [Authorize(Policy = "AdminPolicy")]
-        [HttpPost("CreateBookWithCover")]
-        public async Task<ActionResult<Guid>> CreateBookWithCover([FromForm]BooksRequestWithPicture request)
+        [HttpPost("AddCoverToBook")]
+        public async Task<ActionResult<string>> AddCoverToBook(Guid id, IFormFile CoverPhoto)
         {
-            var book = new Book(
+            var book = await _booksService.GetBookById(id);
+
+            if (book == null)
+            {
+                return NotFound("Wrong Book ID");
+            }
+
+            if (CoverPhoto != null)
+            {
+                string folder = "bookscovers/";
+                folder += Guid.NewGuid().ToString() + "_" + CoverPhoto.FileName;
+
+                book.CoverImageUrl = "/" + folder;
+
+                string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folder);
+
+                await CoverPhoto.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+            }
+
+            return Ok(book.CoverImageUrl);
+        }
+
+        [Authorize(Policy = "AdminPolicy")]
+        [HttpPost("CreateBook")]
+        public async Task<ActionResult<Guid>> CreateBook([FromBody] BooksRequest request)
+        {
+            var book = Book.Create(
                 Guid.NewGuid(),
                 request.ISBN,
                 request.Title,
@@ -67,26 +106,14 @@ namespace Library_API.Controllers
                 request.Datein,
                 request.Dateout,
                 request.AuthorId,
-                request.CoverPhoto,
                 ""
                 );
-
-            if (book.CoverPhoto != null)
-            {
-                string folder = "bookscovers/";
-                folder += Guid.NewGuid().ToString() + "_" + book.CoverPhoto.FileName;
-
-                book.CoverImageUrl = "/" + folder;
-
-                string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folder);
-
-                await book.CoverPhoto.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
-            }
 
             var bookId = await _booksService.CreateBook2(book, book.AuthorId);
 
             return Ok(bookId);
         }
+
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpPut("UpdateBook")]
@@ -95,7 +122,7 @@ namespace Library_API.Controllers
             var bookId = await _booksService.UpdateBook(id,
                 request.ISBN,
                 request.Title,
-                request.Genre,
+                request.Genre,  
                 request.Description,
                 request.AuthorName,
                 request.Datein,

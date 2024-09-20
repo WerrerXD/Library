@@ -3,6 +3,7 @@ using Library_API.DataAccess;
 using Library_API.DataAccess.Repositories;
 using Library_API.Infrastructure;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -38,18 +39,22 @@ namespace Library_API.Application.Services
 
         public async Task<string> Login(string email, string password)
         {
+
             var user = await _usersRepository.GetByEmail(email);
+
+            if (user == null)
+            {
+                return null;
+            }
 
             var result = _passwordHasher.Verify(password, user.PasswordHash);
 
             if (result == false)
             {
-                throw new Exception("Failed to login");
+                return null;
             }
 
             var token = _jwtProvider.GenerateToken(user);
-
-
 
             return token;
         }

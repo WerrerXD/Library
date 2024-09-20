@@ -8,6 +8,8 @@ namespace Library_API.Core.Models
 {
     public class Author
     {
+
+        public Author() { }
         private Author(Guid id, string name, string lastname, DateOnly dateofbirth, string country)
         {
             Id = id;
@@ -29,24 +31,13 @@ namespace Library_API.Core.Models
 
         public List<Book> AuthorBooks { get; set; } = [];
 
-        public static (Author author, string Error) Create(Guid id, string name, string lastname, DateOnly dateofbirth, string country)
+        public static Author Create(Guid id, string name, string lastname, DateOnly dateofbirth, string country)
         {
-            var error = string.Empty;
 
             var author = new Author(id, name, lastname, dateofbirth, country);
 
-            return (author, error);
+            return author;
         }
 
-        public static (Author author, string Error) Create(Guid id, string name, string lastname, DateOnly dateofbirth, string country, List<Book> authorBooks)
-        {
-            var error = string.Empty;
-
-            var author = new Author(id, name, lastname, dateofbirth, country);
-
-            author.AuthorBooks = authorBooks;
-
-            return (author, error);
-        }
     }
 }

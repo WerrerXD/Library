@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Library_API.DataAccess.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20240830174510_alterusers")]
-    partial class alterusers
+    [Migration("20240918120311_AddTables2")]
+    partial class AddTables2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Library_API.DataAccess.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Library_API.DataAccess.Entities.AuthorEntity", b =>
+            modelBuilder.Entity("Library_API.Core.Models.Author", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,7 +51,7 @@ namespace Library_API.DataAccess.Migrations
                     b.ToTable("Authors");
                 });
 
-            modelBuilder.Entity("Library_API.DataAccess.Entities.BookEntity", b =>
+            modelBuilder.Entity("Library_API.Core.Models.Book", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,7 +65,6 @@ namespace Library_API.DataAccess.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("CoverImageUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateOnly>("DateIn")
@@ -87,8 +86,7 @@ namespace Library_API.DataAccess.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -100,7 +98,7 @@ namespace Library_API.DataAccess.Migrations
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("Library_API.DataAccess.Entities.UserEntity", b =>
+            modelBuilder.Entity("Library_API.Core.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,9 +121,9 @@ namespace Library_API.DataAccess.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Library_API.DataAccess.Entities.BookEntity", b =>
+            modelBuilder.Entity("Library_API.Core.Models.Book", b =>
                 {
-                    b.HasOne("Library_API.DataAccess.Entities.AuthorEntity", "Author")
+                    b.HasOne("Library_API.Core.Models.Author", "Author")
                         .WithMany("AuthorBooks")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -134,7 +132,7 @@ namespace Library_API.DataAccess.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("Library_API.DataAccess.Entities.AuthorEntity", b =>
+            modelBuilder.Entity("Library_API.Core.Models.Author", b =>
                 {
                     b.Navigation("AuthorBooks");
                 });

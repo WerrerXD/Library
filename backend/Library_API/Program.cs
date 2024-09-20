@@ -1,4 +1,5 @@
 using Library_API.Application;
+using Library_API.Application.Mappings;
 using Library_API.Application.Services;
 using Library_API.AuthorizeRequirements.Handlers;
 using Library_API.Core.Abstractions;
@@ -15,6 +16,7 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAutoMapper(typeof(TestProfile));
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddHttpContextAccessor();

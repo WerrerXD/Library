@@ -1,30 +1,29 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Library_API.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class alterusers : Migration
+    public partial class AddTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Authors",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserName = table.Column<string>(type: "text", nullable: false),
-                    LastName = table.Column<string>(type: "text", nullable: false),
-                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
-                    Country = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Authors", x => x.Id);
-                });
+    name: "Authors",
+    columns: table => new
+    {
+        Id = table.Column<Guid>(type: "uuid", nullable: false),
+        UserName = table.Column<string>(type: "text", nullable: false),
+        LastName = table.Column<string>(type: "text", nullable: false),
+        DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
+        Country = table.Column<string>(type: "text", nullable: false)
+    },
+    constraints: table =>
+    {
+        table.PrimaryKey("PK_Authors", x => x.Id);
+    });
 
             migrationBuilder.CreateTable(
                 name: "Users",
@@ -76,14 +75,7 @@ namespace Library_API.DataAccess.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Books");
 
-            migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Authors");
         }
     }
 }

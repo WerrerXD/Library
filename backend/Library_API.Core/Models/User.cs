@@ -27,8 +27,7 @@ namespace Library_API.Core.Models
 
         public static User Create(Guid id, string userName, string passwordHash, string email)
         {
-            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(passwordHash) || string.IsNullOrEmpty(email))
-                 throw new Exception("User data can not be empty");
+        
             return new User(id, userName, passwordHash, email);
         }
     }

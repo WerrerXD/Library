@@ -1,9 +1,11 @@
 ﻿using Library_API.Application.Services;
-using Library_API.Contracts;
+using Library_API.Core.Contracts;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Library_API.Controllers
 {
@@ -13,10 +15,12 @@ namespace Library_API.Controllers
     public class AuthorsController : ControllerBase
     {
         private readonly IAuthorsService _authorsService;
+        private readonly IMapper _mapper;
 
-        public AuthorsController(IAuthorsService authorsService)
+        public AuthorsController(IAuthorsService authorsService, IMapper mapper)
         {
             _authorsService = authorsService;
+            _mapper = mapper;
         }
 
         [HttpGet("GetAuthors")]
@@ -24,7 +28,8 @@ namespace Library_API.Controllers
         {
             var authors = await _authorsService.GetAllAuthors();
 
-            var response = authors.Select(a => new AuthorsResponse(a.Id, a.UserName, a.LastName, a.DateOfBirth, a.Country));
+            var response = authors.Select(a => _mapper.Map<AuthorsResponse>(a));
+
 
             return Ok(response);
         }
@@ -33,8 +38,12 @@ namespace Library_API.Controllers
         public async Task<ActionResult<AuthorsResponse>> GetAuthorByID(Guid id)
         {
             var author = await _authorsService.GetAuthorById(id);
+            if (author == null)
+            {
+                 return NotFound("Wrong Author ID");
+            }
 
-            var response = author;
+            var response = _mapper.Map<AuthorsResponse>(author);
 
             return Ok(response);
         }
@@ -43,7 +52,7 @@ namespace Library_API.Controllers
         [HttpPost("CreateAuthor")]
         public async Task<ActionResult<Guid>> CreateAuthor([FromBody] AuthorsRequest request)
         {
-            var (author, error) = Author.Create(
+            var author = Author.Create(
                 Guid.NewGuid(),
                 request.UserName,
                 request.LastName,
@@ -51,12 +60,7 @@ namespace Library_API.Controllers
                 request.Country
                 );
 
-            if (!string.IsNullOrEmpty(error))
-            {
-                throw new Exception(error);
-            }
-
-            var authorId = await _authorsService.CreateAuthor(author.UserName, author.LastName, author.DateOfBirth, author.Country);
+            var authorId = await _authorsService.CreateAuthor(author);
 
             return Ok(authorId);
         }
@@ -87,8 +91,13 @@ namespace Library_API.Controllers
         public async Task<ActionResult<List<BooksResponse>>> GetAuthorsBooks(string lastName)
         {
             var books = await _authorsService.GetAuthorsBooks(lastName);
-           
-            var response = books.Select(b => new BooksResponse(b.Id, b.ISBN, b.Title, b.Genre, b.Description, b.AuthorName, b.DateIn, b.DateOut, b.AuthorId));
+
+            if(books == null)
+            {
+                return NotFound("Wrong Authors LastName");
+            }
+
+            var response = books.Select(b => _mapper.Map<BooksResponse>(b));
 
             return Ok(response);
         }

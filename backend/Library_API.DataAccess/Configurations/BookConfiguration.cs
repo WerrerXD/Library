@@ -1,13 +1,12 @@
 ﻿using Library_API.Core.Models;
-using Library_API.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Library_API.DataAccess.Configurations
 {
-    public class BookConfiguration: IEntityTypeConfiguration<BookEntity>
+    public class BookConfiguration: IEntityTypeConfiguration<Book>
     {
-        public void Configure(EntityTypeBuilder<BookEntity> builder) 
+        public void Configure(EntityTypeBuilder<Book> builder) 
         {
             builder.HasKey(x => x.Id);
 
@@ -19,7 +18,6 @@ namespace Library_API.DataAccess.Configurations
                 .IsRequired();
 
             builder.Property(b => b.Title)
-                .HasMaxLength(Book.MAX_TITLE_LENGTH)
                 .IsRequired();
 
             builder.Property(b => b.Description);
@@ -29,7 +27,6 @@ namespace Library_API.DataAccess.Configurations
 
             builder.Property(b => b.Genre)
                 .IsRequired();
-
 
             builder.Property(b => b.DateIn);
 

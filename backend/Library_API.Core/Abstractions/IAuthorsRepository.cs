@@ -13,9 +13,7 @@ namespace Library_API.Core.Abstractions
 
         Task<Author> GetById(Guid id);
 
-        //Task<List<AuthorEntity>> GetByPage(int page, int pageSize);
-
-        Task<Guid> Create(string userName, string lastName, DateOnly dateOfBirth, string country);
+        Task<Guid> Create(Author author);
 
         Task<Guid> Update(Guid id, string userName, string lastName, DateOnly dateOfBirth, string country);
 

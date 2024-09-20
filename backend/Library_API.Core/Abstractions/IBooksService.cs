@@ -4,7 +4,6 @@ namespace Library_API.Application.Services
 {
     public interface IBooksService
     {
-        Task<Guid> CreateBook(double isbn, string title, string genre, string description, string authorname, DateOnly datein, DateOnly dateout, Guid authorid);
         Task<Guid> CreateBook2(Book book, Guid authorid);
         Task<Guid> DeleteBook(Guid id);
         Task<List<Book>> GetAllBooks();

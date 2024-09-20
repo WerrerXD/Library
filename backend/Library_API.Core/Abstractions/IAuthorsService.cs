@@ -11,7 +11,7 @@ namespace Library_API.Core.Abstractions
     {
         Task<List<Author>> GetAllAuthors();
         Task<Author> GetAuthorById(Guid id);
-        Task<Guid> CreateAuthor(string userName, string lastName, DateOnly dateOfBirth, string country);
+        Task<Guid> CreateAuthor(Author author);
         Task<Guid> UpdateAuthor(Guid id, string userName, string lastName, DateOnly dateOfBirth, string country);
         Task<Guid> DeleteAuthor(Guid id);
         Task<List<Book>> GetAuthorsBooks(string authorName);

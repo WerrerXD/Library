@@ -1,6 +1,5 @@
 ﻿using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
-using Library_API.DataAccess.Entities;
 using Library_API.DataAccess.Repositories;
 using System;
 using System.Collections.Generic;
@@ -29,9 +28,9 @@ namespace Library_API.Application.Services
             return await _authorsRepository.GetById(id);
         }
 
-        public async Task<Guid> CreateAuthor(string userName, string lastName, DateOnly dateOfBirth, string country)
+        public async Task<Guid> CreateAuthor(Author author)
         {
-            return await _authorsRepository.Create(userName, lastName, dateOfBirth, country);
+            return await _authorsRepository.Create(author);
         }
 
         public async Task<Guid> UpdateAuthor(Guid id, string userName, string lastName, DateOnly dateOfBirth, string country)

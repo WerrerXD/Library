@@ -1,10 +1,12 @@
 ﻿using Library_API.Application.Services;
 using Library_API.Core.Models;
 using Microsoft.AspNetCore.Mvc;
-using Library_API.Contracts;
+using Library_API.Core.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Library_API.Core.Abstractions;
+using AutoMapper;
+using System.Web.Helpers;
 
 namespace Library_API.Controllers
 {
@@ -13,14 +15,19 @@ namespace Library_API.Controllers
     public class UsersController: ControllerBase
     {
         private readonly IUserService _userService;
-        public UsersController(IUserService userService) 
+        private readonly IMapper _mapper;
+        public UsersController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpPost("Register")]
         public async Task <ActionResult> Register([FromBody]RegisterUserRequest request)
         {
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password) || string.IsNullOrEmpty(request.Username))
+                return BadRequest("User data can not be empty");
+
             await _userService.Register(request.Username, request.Email, request.Password);
 
             return Ok();
@@ -29,8 +36,15 @@ namespace Library_API.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult> Login([FromBody]LoginUserRequest request)
         {
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+                return BadRequest("User data can not be empty");
+
             var token = await _userService.Login(request.Email, request.Password);
 
+            if (token == null)
+            {
+                return NotFound("Failed to login");
+            }
 
             HttpContext.Response.Cookies.Append("tasty-cookies", token);
 
@@ -65,8 +79,12 @@ namespace Library_API.Controllers
 
             var books = await _userService.GetUserBooks(email);
 
+            if (books == null)
+            {
+                return NotFound("No books were taken");
+            }
 
-            var response = books.Select(b => new BooksResponse(b.Id, b.ISBN, b.Title, b.Genre, b.Description, b.AuthorName, b.DateIn, b.DateOut, b.AuthorId));
+            var response = books.Select(b => _mapper.Map<BooksResponse>(b));
 
             return Ok(response);
         }
@@ -84,13 +102,14 @@ namespace Library_API.Controllers
 
         [Authorize]
         [HttpPost("AddBookByTitleAndAuthor")]
-        public async Task<ActionResult> AddBookByTitleAndAuthor(string title = "", string authorName = "")
+        public async Task<ActionResult> AddBookByTitleAndAuthor(string title, string authorName)
         {
             var email = HttpContext.Request.Cookies["UserEmail"];
 
             await _userService.AddBookByTitleAndAuthor(title, authorName, email);
 
-            return Ok();
+            return Ok()
+                ?? throw new Exception("No books with this title and author");
         }
 
 

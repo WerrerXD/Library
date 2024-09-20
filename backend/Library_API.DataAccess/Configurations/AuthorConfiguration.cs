@@ -1,4 +1,4 @@
-﻿using Library_API.DataAccess.Entities;
+﻿using Library_API.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Library_API.DataAccess.Configurations
 {
-    public class AuthorConfiguration : IEntityTypeConfiguration<AuthorEntity>
+    public class AuthorConfiguration : IEntityTypeConfiguration<Author>
     {
-        public void Configure(EntityTypeBuilder<AuthorEntity> builder)
+        public void Configure(EntityTypeBuilder<Author> builder)
         {
             builder.HasKey(x => x.Id);
 
