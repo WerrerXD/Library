@@ -8,7 +8,7 @@ namespace Library_API.Core.Models
 {
     public class User
     {
-
+        public User() { }
         private User(Guid id, string userName, string passwordHash, string email)
         {
             Id = id;

@@ -1,4 +1,4 @@
-﻿namespace Library_API.Infrastructure
+﻿namespace Library_API.Core.Abstractions
 {
     public interface IPasswordHasher
     {

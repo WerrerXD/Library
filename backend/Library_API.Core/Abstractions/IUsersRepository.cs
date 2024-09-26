@@ -1,6 +1,6 @@
 ﻿using Library_API.Core.Models;
 
-namespace Library_API.DataAccess.Repositories
+namespace Library_API.Core.Abstractions
 {
     public interface IUsersRepository
     {

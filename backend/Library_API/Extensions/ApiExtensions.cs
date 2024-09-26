@@ -1,4 +1,10 @@
-﻿using Library_API.AuthorizeRequirements;
+﻿using Library_API.Application.UseCases.AuthorUseCases;
+using Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces;
+using Library_API.Application.UseCases.BookUseCases;
+using Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces;
+using Library_API.Application.UseCases.UserUseCases;
+using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
+using Library_API.AuthorizeRequirements;
 using Library_API.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -52,6 +58,32 @@ namespace Library_API.Extensions
                     policy.Requirements.Add(new AdminRequirement("IsAdmin"));
                 });
             });
+        }
+
+        public static void AddUseCases(this IServiceCollection services)
+        {
+            services.AddScoped<IGetAllBooksUseCase, GetAllBooksUseCase>();
+            services.AddScoped<ICreateBookUseCase, CreateBookUseCase>();
+            services.AddScoped<IDeleteBookUseCase, DeleteBookUseCase>();
+            services.AddScoped<IGetBookByIdUseCase, GetBookByIdUseCase>();
+            services.AddScoped<IGetBookByIsbnUseCase, GetBookByIsbnUseCase>();
+            services.AddScoped<IUpdateBookUseCase, UpdateBookUseCase>();
+            services.AddScoped<IAddCoverToBookUseCase, AddCoverToBookUseCase>();
+
+
+            services.AddScoped<IGetAllAuthorsUseCase, GetAllAuthorsUseCase>();
+            services.AddScoped<ICreateAuthorUseCase, CreateAuthorUseCase>();
+            services.AddScoped<IDeleteAuthorUseCase, DeleteAuthorUseCase>();
+            services.AddScoped<IGetAuthorByIdUseCase, GetAuthorByIdUseCase>();
+            services.AddScoped<IGetAuthorsBooksUseCase, GetAuthorsBooksUseCase>();
+            services.AddScoped<IUpdateAuthorUseCase, UpdateAuthorUseCase>();
+
+            services.AddScoped<IAddBookToUserByIsbnUseCase, AddBookToUserByIsbnUseCase>();
+            services.AddScoped<IAddBookToUserByTitleAuthorUseCase, AddBookToUserByTitleAuthorUseCase>();
+            services.AddScoped<IGetUserBooksUseCase, GetUserBooksUseCase>();
+            services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
+            services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+
         }
     }
 }

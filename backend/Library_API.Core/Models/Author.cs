@@ -8,7 +8,6 @@ namespace Library_API.Core.Models
 {
     public class Author
     {
-
         public Author() { }
         private Author(Guid id, string name, string lastname, DateOnly dateofbirth, string country)
         {

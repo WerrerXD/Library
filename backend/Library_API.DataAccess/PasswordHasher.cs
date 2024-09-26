@@ -1,6 +1,6 @@
 ﻿using Library_API.Core.Abstractions;
 
-namespace Library_API.Infrastructure
+namespace Library_API.DataAccess
 {
     public class PasswordHasher : IPasswordHasher
     {

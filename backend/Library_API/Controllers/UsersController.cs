@@ -1,5 +1,4 @@
-﻿using Library_API.Application.Services;
-using Library_API.Core.Models;
+﻿using Library_API.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Library_API.Core.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Library_API.Core.Abstractions;
 using AutoMapper;
 using System.Web.Helpers;
+using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
 
 namespace Library_API.Controllers
 {
@@ -14,12 +14,27 @@ namespace Library_API.Controllers
     [Route("[controller]")]
     public class UsersController: ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IAddBookToUserByIsbnUseCase _addBookToUserByIsbnUseCase;
+        private readonly IAddBookToUserByTitleAuthorUseCase _addBookToUserByTitleAuthorUseCase;
+        private readonly IGetUserBooksUseCase _getUserBooksUseCase;
+        private readonly ILoginUserUseCase _loginUserUseCase;
+        private readonly IRegisterUserUseCase _registerUserUseCase;
+
         private readonly IMapper _mapper;
-        public UsersController(IUserService userService, IMapper mapper)
+        public UsersController(
+                               IMapper mapper,
+                               IAddBookToUserByIsbnUseCase addBookToUserByIsbnUseCase,
+                               IAddBookToUserByTitleAuthorUseCase addBookToUserByTitleAuthorUseCase,
+                               IGetUserBooksUseCase getUserBooksUseCase,
+                               ILoginUserUseCase loginUserUseCase,
+                               IRegisterUserUseCase registerUserUseCase)
         {
-            _userService = userService;
             _mapper = mapper;
+            _addBookToUserByIsbnUseCase = addBookToUserByIsbnUseCase;
+            _addBookToUserByTitleAuthorUseCase = addBookToUserByTitleAuthorUseCase;
+            _getUserBooksUseCase = getUserBooksUseCase;
+            _loginUserUseCase = loginUserUseCase;
+            _registerUserUseCase = registerUserUseCase;
         }
 
         [HttpPost("Register")]
@@ -28,7 +43,7 @@ namespace Library_API.Controllers
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password) || string.IsNullOrEmpty(request.Username))
                 return BadRequest("User data can not be empty");
 
-            await _userService.Register(request.Username, request.Email, request.Password);
+            await _registerUserUseCase.ExecuteAsync(request.Username, request.Email, request.Password);
 
             return Ok();
         }
@@ -39,7 +54,7 @@ namespace Library_API.Controllers
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
                 return BadRequest("User data can not be empty");
 
-            var token = await _userService.Login(request.Email, request.Password);
+            var token = await _loginUserUseCase.ExecuteAsync(request.Email, request.Password);
 
             if (token == null)
             {
@@ -77,7 +92,7 @@ namespace Library_API.Controllers
         {
             var email = HttpContext.Request.Cookies["UserEmail"];
 
-            var books = await _userService.GetUserBooks(email);
+            var books = await _getUserBooksUseCase.ExecuteAsync(email);
 
             if (books == null)
             {
@@ -95,7 +110,7 @@ namespace Library_API.Controllers
         {
             var email = HttpContext.Request.Cookies["UserEmail"];
 
-            await _userService.AddBookByISBN(isbn, email);
+            await _addBookToUserByIsbnUseCase.ExecuteAsync(isbn, email);
 
             return Ok();
         }
@@ -106,7 +121,7 @@ namespace Library_API.Controllers
         {
             var email = HttpContext.Request.Cookies["UserEmail"];
 
-            await _userService.AddBookByTitleAndAuthor(title, authorName, email);
+            await _addBookToUserByTitleAuthorUseCase.ExecuteAsync(title, authorName, email);
 
             return Ok()
                 ?? throw new Exception("No books with this title and author");

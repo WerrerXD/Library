@@ -5,10 +5,7 @@ namespace Library_API.Core.Models
 {
     public class Book
     {
-
         public Book() { }
-
-
         private Book(Guid id, double isbn, string title, string genre, string description, string author, DateOnly datein, DateOnly dateout, Guid authorid, string coverImageUrl)
         {
             Id = id;

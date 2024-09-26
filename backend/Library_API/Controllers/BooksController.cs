@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
-using Library_API.Application.Services;
+using Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces;
 using Library_API.Core.Contracts;
 using Library_API.Core.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Web.Helpers;
 using System.IO;
@@ -14,21 +15,43 @@ namespace Library_API.Controllers
     [Route("[controller]")]
     public class BooksController: ControllerBase
     {
-        private readonly IBooksService _booksService;
-        public static IWebHostEnvironment? _webHostEnvironment;
-        private readonly IMapper _mapper;
+        private readonly IGetAllBooksUseCase _getAllBooksUseCase;
+        private readonly IGetBookByIdUseCase _getBookByIdUseCase;
+        private readonly IGetBookByIsbnUseCase _getBookByIsbnUseCase;
+        private readonly ICreateBookUseCase _createBookUseCase;
+        private readonly IUpdateBookUseCase _updateBookUseCase;
+        private readonly IDeleteBookUseCase _deleteBookUseCase;
+        private readonly IAddCoverToBookUseCase _addCoverToBookUseCase;
 
-        public BooksController(IBooksService booksService, IWebHostEnvironment webHostEnvironment, IMapper mapper)
+        private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public BooksController(
+                               IMapper mapper,
+                               IGetAllBooksUseCase getAllBooksUseCase,
+                               IGetBookByIdUseCase getBookByIdUseCase,
+                               IGetBookByIsbnUseCase getBookByIsbnUseCase,
+                               ICreateBookUseCase createBookUseCase,
+                               IUpdateBookUseCase updateBookUseCase,
+                               IDeleteBookUseCase deleteBookUseCase,
+                               IAddCoverToBookUseCase addCoverToBookUseCase,
+                               IWebHostEnvironment webHostEnvironment)
         {
-            _booksService = booksService;
-            _webHostEnvironment = webHostEnvironment;
             _mapper = mapper;
+            _getAllBooksUseCase = getAllBooksUseCase;
+            _getBookByIdUseCase = getBookByIdUseCase;
+            _getBookByIsbnUseCase = getBookByIsbnUseCase;
+            _createBookUseCase = createBookUseCase;
+            _updateBookUseCase = updateBookUseCase;
+            _deleteBookUseCase = deleteBookUseCase;
+            _addCoverToBookUseCase = addCoverToBookUseCase;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet("getAllBooks")]
         public async Task<ActionResult<List<BooksResponse>>> GetBooks()
         {
-            var books = await _booksService.GetAllBooks();
+            var books = await _getAllBooksUseCase.ExecuteAsync();
 
             var response = books.Select(b => _mapper.Map<BooksResponse>(b));
 
@@ -38,7 +61,7 @@ namespace Library_API.Controllers
         [HttpGet("GetBookById")]
         public async Task<ActionResult<BooksResponse>> GetBookByID(Guid id)
         {
-            var book = await _booksService.GetBookById(id);
+            var book = await _getBookByIdUseCase.ExecuteAsync(id);
 
             if (book == null) 
             {
@@ -53,7 +76,7 @@ namespace Library_API.Controllers
         [HttpGet("GetBookByIspn")]
         public async Task<ActionResult<BooksResponse>> GetBookByISBN(int isbn)
         {
-            var book = await _booksService.GetBookByISBN(isbn);
+            var book = await _getBookByIsbnUseCase.ExecuteAsync(isbn);
 
 
             if (book == null)
@@ -68,28 +91,26 @@ namespace Library_API.Controllers
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpPost("AddCoverToBook")]
-        public async Task<ActionResult<string>> AddCoverToBook(Guid id, IFormFile CoverPhoto)
+        public async Task<ActionResult<string>> AddCoverToBook(Guid id, IFormFile coverPhoto)
         {
-            var book = await _booksService.GetBookById(id);
+            if (coverPhoto == null)
+            {
+                return BadRequest("Image can not be empty");
+            }
 
-            if (book == null)
+            string folder = "bookscovers/";
+            folder += Guid.NewGuid().ToString() + "_" + coverPhoto.FileName;
+
+            string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folder);
+
+            var url = await _addCoverToBookUseCase.ExecuteAsync(id, coverPhoto, serverFolder, folder);
+
+            if (url == null)
             {
                 return NotFound("Wrong Book ID");
             }
 
-            if (CoverPhoto != null)
-            {
-                string folder = "bookscovers/";
-                folder += Guid.NewGuid().ToString() + "_" + CoverPhoto.FileName;
-
-                book.CoverImageUrl = "/" + folder;
-
-                string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folder);
-
-                await CoverPhoto.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
-            }
-
-            return Ok(book.CoverImageUrl);
+            return Ok(url);
         }
 
         [Authorize(Policy = "AdminPolicy")]
@@ -109,7 +130,7 @@ namespace Library_API.Controllers
                 ""
                 );
 
-            var bookId = await _booksService.CreateBook2(book, book.AuthorId);
+            var bookId = await _createBookUseCase.ExecuteAsync(book);
 
             return Ok(bookId);
         }
@@ -119,7 +140,7 @@ namespace Library_API.Controllers
         [HttpPut("UpdateBook")]
         public async Task<ActionResult<Guid>> UpdateBooks(Guid id, [FromBody] BooksRequest request)
         {
-            var bookId = await _booksService.UpdateBook(id,
+            var bookId = await _updateBookUseCase.ExecuteAsync(id,
                 request.ISBN,
                 request.Title,
                 request.Genre,  
@@ -137,7 +158,7 @@ namespace Library_API.Controllers
         [HttpDelete("DeleteBook")]
         public async Task<ActionResult<Guid>> DeleteBooks(Guid id)
         {
-            return Ok(await _booksService.DeleteBook(id));
+            return Ok(await _deleteBookUseCase.ExecuteAsync(id));
         }
     }
 }
