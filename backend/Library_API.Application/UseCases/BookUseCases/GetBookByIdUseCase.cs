@@ -1,7 +1,6 @@
 ﻿using Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
-using Library_API.DataAccess.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +20,8 @@ namespace Library_API.Application.UseCases.BookUseCases
 
         public async Task<Book> ExecuteAsync(Guid id)
         {
-            return await _booksRepository.GetById(id);
+            var book = await _booksRepository.GetById(id)?? throw new Exception("Book does not exist");
+            return book;
         }
     }
 }

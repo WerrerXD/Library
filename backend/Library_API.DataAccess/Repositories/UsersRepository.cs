@@ -11,20 +11,11 @@ using System.Threading.Tasks;
 
 namespace Library_API.DataAccess.Repositories
 {
-    public class UsersRepository : IUsersRepository
+    public class UsersRepository : Repository<User> ,IUsersRepository
     {
-        private readonly LibraryDbContext _context;
-
         public UsersRepository(LibraryDbContext context)
+            :base(context)
         {
-            _context = context;
-
-        }
-
-        public async Task Add(User user)
-        {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<User> GetByEmail(string email)
@@ -50,7 +41,7 @@ namespace Library_API.DataAccess.Repositories
             return books;
         }
 
-        public async Task AddBookByISBN(int isbn, string email)
+        public async Task<int> AddBookByISBN(int isbn, string email)
         {
             var user = await GetByEmail(email);
 
@@ -58,7 +49,7 @@ namespace Library_API.DataAccess.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.ISBN == isbn);
 
-            await _context.Books
+            var count = await _context.Books
                 .AsNoTracking()
                 .Where(b => b.ISBN == isbn)
                 .Where(b => b.DateOut.CompareTo(DateOnly.FromDateTime(DateTime.UtcNow)) <= 0)
@@ -66,9 +57,10 @@ namespace Library_API.DataAccess.Repositories
                     .SetProperty(b => b.DateIn, b => DateOnly.FromDateTime(DateTime.UtcNow))
                     .SetProperty(b => b.DateOut, b => DateOnly.FromDateTime(DateTime.UtcNow).AddDays(14))
                     .SetProperty(b => b.UserId, b => user.Id));
+            return count;
         }
 
-        public async Task AddBookByTitleAndAuthor(string title, string authorName, string email)
+        public async Task<int> AddBookByTitleAndAuthor(string title, string authorName, string email)
         {
             var user = await GetByEmail(email);
 
@@ -76,7 +68,7 @@ namespace Library_API.DataAccess.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.Title == title && b.AuthorName == authorName);
 
-            await _context.Books
+            var count = await _context.Books
                 .AsNoTracking()
                 .Where(b => b.Title == title)
                 .Where(b => b.AuthorName == authorName)
@@ -85,6 +77,7 @@ namespace Library_API.DataAccess.Repositories
                     .SetProperty(b => b.DateIn, b => DateOnly.FromDateTime(DateTime.UtcNow))
                     .SetProperty(b => b.DateOut, b => DateOnly.FromDateTime(DateTime.UtcNow).AddDays(14))
                     .SetProperty(b => b.UserId, b => user.Id));
+            return count;
         }
 
 

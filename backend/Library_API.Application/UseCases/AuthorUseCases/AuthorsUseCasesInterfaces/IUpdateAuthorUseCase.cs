@@ -1,7 +1,9 @@
-﻿namespace Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces
+﻿using Library_API.Core.Models;
+
+namespace Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces
 {
     public interface IUpdateAuthorUseCase
     {
-        Task<Guid> ExecuteAsync(Guid id, string userName, string lastName, DateOnly dateOfBirth, string country);
+        Task ExecuteAsync(Author author);
     }
 }

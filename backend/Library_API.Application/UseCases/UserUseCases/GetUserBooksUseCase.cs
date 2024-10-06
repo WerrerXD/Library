@@ -20,6 +20,7 @@ namespace Library_API.Application.UseCases.UserUseCases
 
         public async Task<List<Book>> ExecuteAsync(string email)
         {
+            _ = await _usersRepository.GetByEmail(email) ?? throw new Exception("User does not exist");
             return await _usersRepository.GetBooks(email);
         }
     }

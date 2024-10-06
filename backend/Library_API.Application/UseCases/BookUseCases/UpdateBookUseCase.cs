@@ -1,7 +1,6 @@
 ﻿using Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
-using Library_API.DataAccess.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +12,28 @@ namespace Library_API.Application.UseCases.BookUseCases
     public class UpdateBookUseCase : IUpdateBookUseCase
     {
         private readonly IBooksRepository _booksRepository;
+        private readonly IAuthorsRepository _authorsRepository;
 
-        public UpdateBookUseCase(IBooksRepository booksRepository)
+        public UpdateBookUseCase(IBooksRepository booksRepository, IAuthorsRepository authorsRepository)
         {
             _booksRepository = booksRepository;
+            _authorsRepository = authorsRepository;
         }
 
-        public async Task<Guid> ExecuteAsync(Guid id, double isbn, string title, string genre, string description, string authorname, DateOnly datein, DateOnly dateout, Guid authorid)
+        public async Task ExecuteAsync(Book book)
         {
-            return await _booksRepository.Update(id, isbn, title, genre, description, authorname, datein, dateout, authorid);
+            bool isExist = await _booksRepository.IsExist(book.Id);
+            if (!isExist)
+            {
+                throw new Exception("Book does not exist");
+            }
+            isExist = await _authorsRepository.IsExist(book.AuthorId);
+            if (!isExist)
+            {
+                throw new Exception("Author does not exist");
+            }
+
+            await _booksRepository.Update(book);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Library_API.Core.Models
 {
-    public class Author
+    public class Author: IEntity
     {
         public Author() { }
         private Author(Guid id, string name, string lastname, DateOnly dateofbirth, string country)
@@ -18,25 +18,17 @@ namespace Library_API.Core.Models
             Country = country;
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; set; }
 
-        public string UserName { get; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
 
-        public string LastName { get; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
 
-        public DateOnly DateOfBirth { get; }
+        public DateOnly DateOfBirth { get; set; }
 
-        public string Country { get; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
 
         public List<Book> AuthorBooks { get; set; } = [];
-
-        public static Author Create(Guid id, string name, string lastname, DateOnly dateofbirth, string country)
-        {
-
-            var author = new Author(id, name, lastname, dateofbirth, country);
-
-            return author;
-        }
 
     }
 }

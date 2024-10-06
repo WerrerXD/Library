@@ -6,6 +6,7 @@ using Library_API.Application.UseCases.UserUseCases;
 using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
 using Library_API.AuthorizeRequirements;
 using Library_API.DataAccess;
+using Library_API.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -68,7 +69,6 @@ namespace Library_API.Extensions
             services.AddScoped<IGetBookByIdUseCase, GetBookByIdUseCase>();
             services.AddScoped<IGetBookByIsbnUseCase, GetBookByIsbnUseCase>();
             services.AddScoped<IUpdateBookUseCase, UpdateBookUseCase>();
-            services.AddScoped<IAddCoverToBookUseCase, AddCoverToBookUseCase>();
 
 
             services.AddScoped<IGetAllAuthorsUseCase, GetAllAuthorsUseCase>();

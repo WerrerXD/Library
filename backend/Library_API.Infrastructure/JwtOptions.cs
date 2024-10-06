@@ -1,4 +1,4 @@
-﻿namespace Library_API.DataAccess
+﻿namespace Library_API.Infrastructure
 {
     public class JwtOptions
     {

@@ -1,5 +1,6 @@
 ﻿using Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces;
 using Library_API.Core.Abstractions;
+using Library_API.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,15 @@ namespace Library_API.Application.UseCases.AuthorUseCases
             _authorsRepository = authorsRepository;
         }
 
-        public async Task<Guid> ExecuteAsync(Guid id)
+        public async Task ExecuteAsync(Guid id)
         {
-            return await _authorsRepository.Delete(id);
+            bool isExist = await _authorsRepository.IsExist(id);
+            if (!isExist)
+            {
+                throw new Exception("Author does not exist");
+            }
+
+            await _authorsRepository.Delete(id);
         }
     }
 }

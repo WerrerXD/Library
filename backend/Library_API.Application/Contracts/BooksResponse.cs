@@ -1,6 +1,6 @@
 ﻿using Library_API.Core.Models;
 
-namespace Library_API.Core.Contracts
+namespace Library_API.Application.Contracts
 {
     public class BooksResponse: BooksDTO
     {

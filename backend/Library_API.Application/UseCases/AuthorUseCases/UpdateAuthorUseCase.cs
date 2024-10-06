@@ -1,5 +1,6 @@
 ﻿using Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces;
 using Library_API.Core.Abstractions;
+using Library_API.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,14 @@ namespace Library_API.Application.UseCases.AuthorUseCases
             _authorsRepository = authorsRepository;
         }
 
-        public async Task<Guid> ExecuteAsync(Guid id, string userName, string lastName, DateOnly dateOfBirth, string country)
+        public async Task ExecuteAsync(Author author)
         {
-            return await _authorsRepository.Update(id, userName, lastName, dateOfBirth, country);
+            bool isExist = await _authorsRepository.IsExist(author.Id);
+            if (!isExist)
+            {
+                throw new Exception("Author does not exist");
+            }
+            await _authorsRepository.Update(author);
         }
     }
 }

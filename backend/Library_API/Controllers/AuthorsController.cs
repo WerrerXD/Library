@@ -1,4 +1,4 @@
-﻿using Library_API.Core.Contracts;
+﻿using Library_API.Application.Contracts;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -55,69 +55,87 @@ namespace Library_API.Controllers
         [HttpGet("GetAuthorByID")]
         public async Task<ActionResult<AuthorsResponse>> GetAuthorByID(Guid id)
         {
-            var author = await _getAuthorByIdUseCase.ExecuteAsync(id);
-            if (author == null)
+            try
             {
-                 return NotFound("Wrong Author ID");
+                var author = await _getAuthorByIdUseCase.ExecuteAsync(id);
+
+                var response = _mapper.Map<AuthorsResponse>(author);
+
+                return Ok(response);
             }
 
-            var response = _mapper.Map<AuthorsResponse>(author);
-
-            return Ok(response);
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpPost("CreateAuthor")]
         public async Task<ActionResult<Guid>> CreateAuthor([FromBody] AuthorsRequest request)
         {
-            var author = Author.Create(
-                Guid.NewGuid(),
-                request.UserName,
-                request.LastName,
-                request.DateOfBirth,
-                request.Country
-                );
-
-            var authorId = await _createAuthorUseCase.ExecuteAsync(author);
-
-            return Ok(authorId);
+            
+            try
+            {
+                var author = _mapper.Map<Author>(request);
+                var authorId = await _createAuthorUseCase.ExecuteAsync(author);
+                return Ok(authorId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpPut("UpdateAuthor")]
-        public async Task<ActionResult<Guid>> UpdateAuthors(Guid id, [FromBody] AuthorsRequest request)
+        public async Task<ActionResult> UpdateAuthors(Guid id, [FromBody] AuthorsRequest request)
         {
-            var authorId = await _updateAuthorUseCase.ExecuteAsync(id,
-                request.UserName,
-                request.LastName,
-                request.DateOfBirth,
-                request.Country
-                );
-
-            return Ok(authorId);
+            
+            try
+            {
+                var author = _mapper.Map<Author>(request);
+                author.Id = id;
+                await _updateAuthorUseCase.ExecuteAsync(author);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("DeleteAuthor")]
-        public async Task<ActionResult<Guid>> DeleteAuthors(Guid id)
+        public async Task<ActionResult> DeleteAuthors(Guid id)
         {
-            return Ok(await _deleteAuthorUseCase.ExecuteAsync(id));
+            try
+            {
+                await _deleteAuthorUseCase.ExecuteAsync(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
 
         [HttpGet("GetAuthorsBooks")]
-        public async Task<ActionResult<List<BooksResponse>>> GetAuthorsBooks(string lastName)
+        public async Task<ActionResult<List<BooksResponse>>> GetAuthorsBooks(string name, string lastName)
         {
-            var books = await _getAuthorsBooksUseCase.ExecuteAsync(lastName);
-
-            if(books == null)
+            try
             {
-                return NotFound("Wrong Authors LastName");
+                var books = await _getAuthorsBooksUseCase.ExecuteAsync(name, lastName);
+
+                var response = books.Select(b => _mapper.Map<BooksResponse>(b));
+
+                return Ok(response);
             }
-
-            var response = books.Select(b => _mapper.Map<BooksResponse>(b));
-
-            return Ok(response);
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

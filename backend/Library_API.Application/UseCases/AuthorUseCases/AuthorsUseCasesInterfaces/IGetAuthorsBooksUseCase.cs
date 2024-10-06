@@ -4,6 +4,6 @@ namespace Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfa
 {
     public interface IGetAuthorsBooksUseCase
     {
-        Task<List<Book>> ExecuteAsync(string lastname);
+        Task<List<Book>> ExecuteAsync(string name, string lastname);
     }
 }

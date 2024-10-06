@@ -20,6 +20,12 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 
         public async Task<Guid> ExecuteAsync(Author author)
         {
+            bool isExist = await _authorsRepository.IsExistByName(author.UserName, author.LastName);
+            if (isExist)
+            {
+                throw new Exception("Author already exists");
+            }
+
             return await _authorsRepository.Create(author);
         }
     }

@@ -21,7 +21,8 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 
         public async Task<Author?> ExecuteAsync(Guid id)
         {
-            return await _authorsRepository.GetById(id);
+            var author = await _authorsRepository.GetById(id) ?? throw new Exception("Author does not exist");
+            return author;
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
+﻿using Library_API.Application.Interfaces;
+using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
 using System;
@@ -24,18 +25,13 @@ namespace Library_API.Application.UseCases.UserUseCases
 
         public async Task<string> ExecuteAsync(string email, string password)
         {
-            var user = await _usersRepository.GetByEmail(email);
-
-            if (user == null)
-            {
-                return null;
-            }
+            var user = await _usersRepository.GetByEmail(email)?? throw new Exception("User does not exist");
 
             var result = _passwordHasher.Verify(password, user.PasswordHash);
 
             if (result == false)
             {
-                return null;
+                throw new Exception("Wrong password");
             }
 
             var token = _jwtProvider.GenerateToken(user);

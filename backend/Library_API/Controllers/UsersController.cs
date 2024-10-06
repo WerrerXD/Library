@@ -1,11 +1,10 @@
 ﻿using Library_API.Core.Models;
 using Microsoft.AspNetCore.Mvc;
-using Library_API.Core.Contracts;
+using Library_API.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Library_API.Core.Abstractions;
 using AutoMapper;
-using System.Web.Helpers;
 using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
 
 namespace Library_API.Controllers
@@ -42,10 +41,16 @@ namespace Library_API.Controllers
         {
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password) || string.IsNullOrEmpty(request.Username))
                 return BadRequest("User data can not be empty");
+            try
+            {
+                await _registerUserUseCase.ExecuteAsync(request.Username, request.Email, request.Password);
 
-            await _registerUserUseCase.ExecuteAsync(request.Username, request.Email, request.Password);
-
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("Login")]
@@ -53,24 +58,25 @@ namespace Library_API.Controllers
         {
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
                 return BadRequest("User data can not be empty");
-
-            var token = await _loginUserUseCase.ExecuteAsync(request.Email, request.Password);
-
-            if (token == null)
+            try
             {
-                return NotFound("Failed to login");
+                var token = await _loginUserUseCase.ExecuteAsync(request.Email, request.Password);
+
+                HttpContext.Response.Cookies.Append("tasty-cookies", token);
+
+                if (request.Email == "adminmail")
+                    HttpContext.Response.Cookies.Append("IsAdmin", "Yes");
+                else
+                    HttpContext.Response.Cookies.Append("IsAdmin", "No");
+
+                HttpContext.Response.Cookies.Append("UserEmail", request.Email);
+
+                return Ok();
             }
-
-            HttpContext.Response.Cookies.Append("tasty-cookies", token);
-
-            if (request.Email == "adminmail")
-                HttpContext.Response.Cookies.Append("IsAdmin", "Yes");
-            else
-                HttpContext.Response.Cookies.Append("IsAdmin", "No");
-
-            HttpContext.Response.Cookies.Append("UserEmail", request.Email);
-
-            return Ok();
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [Authorize]
@@ -90,41 +96,56 @@ namespace Library_API.Controllers
         [HttpGet("GetUserBooks")]
         public async Task<ActionResult<List<BooksResponse>>> GetUserBooks()
         {
-            var email = HttpContext.Request.Cookies["UserEmail"];
-
-            var books = await _getUserBooksUseCase.ExecuteAsync(email);
-
-            if (books == null)
+            try
             {
-                return NotFound("No books were taken");
+                var email = HttpContext.Request.Cookies["UserEmail"];
+
+                var books = await _getUserBooksUseCase.ExecuteAsync(email);
+
+                var response = books.Select(b => _mapper.Map<BooksResponse>(b));
+
+                return Ok(response);
             }
-
-            var response = books.Select(b => _mapper.Map<BooksResponse>(b));
-
-            return Ok(response);
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [Authorize]
         [HttpPost("AddBookByISBN")]
         public async Task<ActionResult> AddBookByISBN(int isbn)
         {
-            var email = HttpContext.Request.Cookies["UserEmail"];
+            try
+            {
+                var email = HttpContext.Request.Cookies["UserEmail"];
 
-            await _addBookToUserByIsbnUseCase.ExecuteAsync(isbn, email);
+                await _addBookToUserByIsbnUseCase.ExecuteAsync(isbn, email);
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [Authorize]
         [HttpPost("AddBookByTitleAndAuthor")]
         public async Task<ActionResult> AddBookByTitleAndAuthor(string title, string authorName)
         {
-            var email = HttpContext.Request.Cookies["UserEmail"];
+            try
+            {
+                var email = HttpContext.Request.Cookies["UserEmail"];
 
-            await _addBookToUserByTitleAuthorUseCase.ExecuteAsync(title, authorName, email);
+                await _addBookToUserByTitleAuthorUseCase.ExecuteAsync(title, authorName, email);
 
-            return Ok()
-                ?? throw new Exception("No books with this title and author");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
 

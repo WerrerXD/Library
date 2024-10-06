@@ -1,6 +1,8 @@
-﻿using Library_API.Core.Abstractions;
+﻿using BCrypt.Net;
+using Library_API.Application.Interfaces;
+using Library_API.Core.Abstractions;
 
-namespace Library_API.DataAccess
+namespace Library_API.Infrastructure
 {
     public class PasswordHasher : IPasswordHasher
     {

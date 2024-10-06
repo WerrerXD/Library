@@ -8,12 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Library_API.Core\Library_API.Core.csproj">
-      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\Library_API.DataAccess\Library_API.DataAccess.csproj">
-      <ReferenceOutputAssembly>True</ReferenceOutputAssembly>
-    </ProjectReference>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Library_API.Core\Library_API.Core.csproj" />
   </ItemGroup>
 
 </Project>

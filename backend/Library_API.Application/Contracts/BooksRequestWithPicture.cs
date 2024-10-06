@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Library_API.Core.Contracts
+namespace Library_API.Application.Contracts
 {
     public class BooksRequestWithPicture: BooksDTO
     {

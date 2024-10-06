@@ -1,11 +1,13 @@
-using Library_API.Application;
+using Library_API.Application.Interfaces;
 using Library_API.Application.Mappings;
+using Library_API.Application.Services;
 using Library_API.Application.UseCases.AuthorUseCases;
 using Library_API.AuthorizeRequirements.Handlers;
 using Library_API.Core.Abstractions;
 using Library_API.DataAccess;
 using Library_API.DataAccess.Repositories;
 using Library_API.Extensions;
+using Library_API.Infrastructure;
 using Library_API.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.CookiePolicy;
@@ -44,6 +46,9 @@ builder.Services.AddScoped<IAuthorsRepository, AuthorsRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IBookCoverService, BookCoverService>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 
 

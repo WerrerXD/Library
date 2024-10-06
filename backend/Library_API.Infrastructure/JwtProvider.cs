@@ -1,4 +1,4 @@
-﻿using Library_API.Core.Abstractions;
+﻿using Library_API.Application.Interfaces;
 using Library_API.Core.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library_API.DataAccess
+namespace Library_API.Infrastructure
 {
     public class JwtProvider : IJwtProvider
     {

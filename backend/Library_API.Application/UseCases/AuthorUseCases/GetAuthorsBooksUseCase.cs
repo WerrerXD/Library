@@ -18,9 +18,15 @@ namespace Library_API.Application.UseCases.AuthorUseCases
             _authorsRepository = authorsRepository;
         }
 
-        public async Task<List<Book>> ExecuteAsync(string lastname)
+        public async Task<List<Book>> ExecuteAsync(string Name, string LastName)
         {
-            return await _authorsRepository.GetBooks(lastname);
+            bool isExist = await _authorsRepository.IsExistByName(Name, LastName);
+            if (!isExist)
+            {
+                throw new Exception("Author does not exist");
+            }
+            var books = await _authorsRepository.GetBooks(Name, LastName);
+            return books;
         }
     }
 }

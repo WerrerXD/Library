@@ -20,7 +20,7 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 
         public async Task<List<Author>> ExecuteAsync()
         {
-            return await _authorsRepository.Get();
+            return await _authorsRepository.GetAll();
         }
     }
 }

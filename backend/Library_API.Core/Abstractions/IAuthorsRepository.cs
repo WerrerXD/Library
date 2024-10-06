@@ -7,17 +7,9 @@ using System.Threading.Tasks;
 
 namespace Library_API.Core.Abstractions
 {
-    public interface IAuthorsRepository
+    public interface IAuthorsRepository: IRepository<Author>
     {
-        Task<List<Author>> Get();
-
-        Task<Author> GetById(Guid id);
-
-        Task<Guid> Create(Author author);
-
-        Task<Guid> Update(Guid id, string userName, string lastName, DateOnly dateOfBirth, string country);
-
-        Task<Guid> Delete(Guid id);
-        Task<List<Book>> GetBooks(string authorName);
+        Task<List<Book>> GetBooks(string authorName, string authorLastName);
+        Task<bool> IsExistByName(string Name, string LastName);
     }
 }
