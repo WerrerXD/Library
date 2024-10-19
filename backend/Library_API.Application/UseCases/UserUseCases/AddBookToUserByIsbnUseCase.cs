@@ -1,4 +1,5 @@
-﻿using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
+﻿using Library_API.Application.Exceptions;
+using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
 using System;
@@ -22,12 +23,12 @@ namespace Library_API.Application.UseCases.UserUseCases
 
         public async Task ExecuteAsync(int isbn, string email)
         {
-            _ = await _usersRepository.GetByEmail(email) ?? throw new Exception("User does not exist");
-            _ = await _booksRepository.GetByISBN(isbn) ?? throw new Exception("Book does not exist");
+            _ = await _usersRepository.GetByEmail(email) ?? throw new NotFoundException("User does not exist");
+            _ = await _booksRepository.GetByISBN(isbn) ?? throw new NotFoundException("Book does not exist");
             var count = await _usersRepository.AddBookByISBN(isbn, email);
             if (count == 0)
             {
-                throw new Exception("Book that you are looking for is taken");
+                throw new NotFoundException("Book that you are looking for is taken");
             }
         }
     }

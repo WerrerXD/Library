@@ -1,4 +1,5 @@
-﻿using Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces;
+﻿using Library_API.Application.Exceptions;
+using Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
 using System;
@@ -25,15 +26,16 @@ namespace Library_API.Application.UseCases.BookUseCases
             bool isExist = await _booksRepository.IsExist(book.Id);
             if (!isExist)
             {
-                throw new Exception("Book does not exist");
+                throw new NotFoundException("Book does not exist");
             }
             isExist = await _authorsRepository.IsExist(book.AuthorId);
             if (!isExist)
             {
-                throw new Exception("Author does not exist");
+                throw new NotFoundException("Author does not exist");
             }
 
             await _booksRepository.Update(book);
+            await _booksRepository.Save();
         }
     }
 }

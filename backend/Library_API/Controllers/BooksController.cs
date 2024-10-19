@@ -63,69 +63,41 @@ namespace Library_API.Controllers
         [HttpGet("GetBookById")]
         public async Task<ActionResult<BooksResponse>> GetBookByID(Guid id)
         {
-            try
-            {
                 var book = await _getBookByIdUseCase.ExecuteAsync(id);
 
                 var response = _mapper.Map<BooksResponse>(book);
 
                 return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
         }
         [Authorize]
         [HttpGet("GetBookByIspn")]
         public async Task<ActionResult<BooksResponse>> GetBookByISBN(int isbn)
         {
-            try
-            {
                 var book = await _getBookByIsbnUseCase.ExecuteAsync(isbn);
 
                 var response = _mapper.Map<BooksResponse>(book);
 
                 return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
         }
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpPost("AddCoverToBook")]
         public async Task<ActionResult<string>> AddCoverToBook(Guid id, IFormFile coverPhoto)
         {
-            try
-            {
                 var url = await _bookCoverService.AddCoverToBookAsync(id, coverPhoto);
 
                 return Ok(url);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
         }
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpPost("CreateBook")]
         public async Task<ActionResult<Guid>> CreateBook([FromBody] BooksRequest request)
         {
-            
-            try
-            {
+
                 var book = _mapper.Map<Book>(request);
                 var bookId = await _createBookUseCase.ExecuteAsync(book);
 
                 return Ok(bookId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
 
@@ -134,33 +106,19 @@ namespace Library_API.Controllers
         public async Task<ActionResult> UpdateBooks(Guid id, [FromBody] BooksRequest request)
         {
 
-            try
-            {
                 var book = _mapper.Map<Book>(request);
                 book.Id = id;
                 await _updateBookUseCase.ExecuteAsync(book);
 
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
         }
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("DeleteBook")]
         public async Task<ActionResult> DeleteBooks(Guid id)
         {
-            try
-            {
                 await _deleteBookUseCase.ExecuteAsync(id);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
         }
     }
 }

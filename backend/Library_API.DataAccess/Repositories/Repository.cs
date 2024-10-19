@@ -18,6 +18,11 @@ namespace Library_API.DataAccess.Repositories
             _context = context;
         }
 
+        public async Task Save()
+        {
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<T> GetById(Guid id)
         {
             return await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
@@ -31,26 +36,24 @@ namespace Library_API.DataAccess.Repositories
         public async Task<Guid> Create(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
             return entity.Id;
         }
 
         public async Task Update(T entity)
         {
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(T entity)
         {
-            var entity = await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
             _context.Set<T>().Remove(entity);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> IsExist(Guid id)
         {
             return await _context.Set<T>().AnyAsync(x => x.Id == id);
         }
+
+
     }
 }

@@ -63,6 +63,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -78,6 +80,7 @@ app.UseCookiePolicy(new CookiePolicyOptions
     Secure = CookieSecurePolicy.Always
 });
 
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -85,8 +88,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.ErrorHandler();
 
 app.Run();
 

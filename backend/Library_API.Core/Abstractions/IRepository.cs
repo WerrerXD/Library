@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 namespace Library_API.Core.Abstractions
 {
      public interface IRepository<T> where T : class, IEntity  {
+        Task Save();
         Task<T> GetById(Guid id);
         Task<List<T>> GetAll();
         Task<Guid> Create(T entity);
         Task Update(T entity);
-        Task Delete(Guid id);
+        Task Delete(T entity);
         Task<bool> IsExist(Guid id);
       }
 }

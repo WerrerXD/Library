@@ -1,4 +1,4 @@
-﻿using Library_API.Exceptions;
+﻿using Library_API.Application.Exceptions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Net;
@@ -32,19 +32,19 @@ public class ExceptionMiddleware
         string message = "Unexpected error";
         var excpType = ex.GetType();
 
-        if (excpType == typeof(BadRequest))
+        if (excpType == typeof(BadRequestException))
         {
             statusCode = HttpStatusCode.BadRequest;
             message = ex.Message;
         }
-        else if (excpType == typeof(NotFound))
+        else if (excpType == typeof(NotFoundException))
         {
             statusCode = HttpStatusCode.NotFound;
             message = ex.Message;
         }
-        else if (excpType == typeof(Exceptions.NotImplementedException))
+        else if (excpType == typeof(AlreadyExistsException))
         {
-            statusCode = HttpStatusCode.NotImplemented;
+            statusCode = HttpStatusCode.Conflict;
             message = ex.Message;
         }
         else if (excpType == typeof(UnauthorizedException))
@@ -63,6 +63,5 @@ public class ExceptionMiddleware
         context.Response.StatusCode = (int)statusCode;
 
         return context.Response.WriteAsync(result);
-
     }
 }

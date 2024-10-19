@@ -1,4 +1,5 @@
-﻿using Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces;
+﻿using Library_API.Application.Exceptions;
+using Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
 using System;
@@ -21,7 +22,7 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 
         public async Task<Author?> ExecuteAsync(Guid id)
         {
-            var author = await _authorsRepository.GetById(id) ?? throw new Exception("Author does not exist");
+            var author = await _authorsRepository.GetById(id) ?? throw new NotFoundException("Author does not exist");
             return author;
         }
     }

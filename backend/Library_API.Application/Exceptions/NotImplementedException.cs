@@ -1,6 +1,6 @@
-﻿namespace Library_API.Exceptions
+﻿namespace Library_API.Application.Exceptions
 {
-    public class NotImplementedException: Exception
+    public class NotImplementedException : Exception
     {
         public NotImplementedException(string message) : base(message)
         {

@@ -1,4 +1,5 @@
-﻿using Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces;
+﻿using Library_API.Application.Exceptions;
+using Library_API.Application.UseCases.AuthorUseCases.AuthorsUseCasesInterfaces;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
 using System;
@@ -23,10 +24,11 @@ namespace Library_API.Application.UseCases.AuthorUseCases
             bool isExist = await _authorsRepository.IsExist(id);
             if (!isExist)
             {
-                throw new Exception("Author does not exist");
+                throw new NotFoundException("Author does not exist");
             }
-
-            await _authorsRepository.Delete(id);
+            var author = await _authorsRepository.GetById(id);
+            await _authorsRepository.Delete(author);
+            await _authorsRepository.Save();
         }
     }
 }

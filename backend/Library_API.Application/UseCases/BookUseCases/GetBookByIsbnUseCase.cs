@@ -1,4 +1,5 @@
-﻿using Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces;
+﻿using Library_API.Application.Exceptions;
+using Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces;
 using Library_API.Core.Abstractions;
 using Library_API.Core.Models;
 using System;
@@ -20,7 +21,7 @@ namespace Library_API.Application.UseCases.BookUseCases
 
         public async Task<Book> ExecuteAsync(int isbn)
         {
-            var book = await _booksRepository.GetByISBN(isbn)?? throw new Exception("Book does not exist");
+            var book = await _booksRepository.GetByISBN(isbn)?? throw new NotFoundException("Book does not exist");
             return book;
         }
     }

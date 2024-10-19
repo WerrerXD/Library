@@ -26,7 +26,6 @@ namespace Library_API.DataAccess.Repositories
             author?.AuthorBooks.Add(book);
 
             await _context.AddAsync(book);
-            await _context.SaveChangesAsync();
 
             return book.Id;
         }
