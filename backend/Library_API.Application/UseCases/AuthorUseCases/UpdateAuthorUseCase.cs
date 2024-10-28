@@ -12,22 +12,22 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 {
     public class UpdateAuthorUseCase : IUpdateAuthorUseCase
     {
-        private readonly IAuthorsRepository _authorsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateAuthorUseCase(IAuthorsRepository authorsRepository)
+        public UpdateAuthorUseCase(IUnitOfWork unitofwork)
         {
-            _authorsRepository = authorsRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task ExecuteAsync(Author author)
         {
-            bool isExist = await _authorsRepository.IsExist(author.Id);
+            bool isExist = await _unitOfWork.AuthorsRepository.IsExist(author.Id);
             if (!isExist)
             {
                 throw new NotFoundException("Author does not exist");
             }
-            await _authorsRepository.Update(author);
-            await _authorsRepository.Save();
+            await _unitOfWork.AuthorsRepository.Update(author);
+            await _unitOfWork.Save();
         }
     }
 }

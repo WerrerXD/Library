@@ -12,23 +12,23 @@ namespace Library_API.Application.UseCases.BookUseCases
 {
     public class DeleteBookUseCase : IDeleteBookUseCase
     {
-        private readonly IBooksRepository _booksRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteBookUseCase(IBooksRepository booksRepository)
+        public DeleteBookUseCase(IUnitOfWork unitofwork)
         {
-            _booksRepository = booksRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task ExecuteAsync(Guid id)
         {
-            bool isExist = await _booksRepository.IsExist(id);
+            bool isExist = await _unitOfWork.BooksRepository.IsExist(id);
             if (!isExist)
             {
                 throw new NotFoundException("Book does not exist");
             }
-            var book = await _booksRepository.GetById(id);
-            await _booksRepository.Delete(book);
-            await _booksRepository.Save();
+            var book = await _unitOfWork.BooksRepository.GetById(id);
+            await _unitOfWork.BooksRepository.Delete(book);
+            await _unitOfWork.Save();
         }
     }
 }

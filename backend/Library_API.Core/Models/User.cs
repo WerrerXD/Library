@@ -9,7 +9,7 @@ namespace Library_API.Core.Models
     public class User: IEntity
     {
         public User() { }
-        private User(Guid id, string userName, string passwordHash, string email)
+        public User(Guid id, string userName, string passwordHash, string email)
         {
             Id = id;
             UserName = userName;
@@ -24,11 +24,5 @@ namespace Library_API.Core.Models
         public string PasswordHash { get; set; }
 
         public string Email { get; set; }
-
-        public static User Create(Guid id, string userName, string passwordHash, string email)
-        {
-        
-            return new User(id, userName, passwordHash, email);
-        }
     }
 }

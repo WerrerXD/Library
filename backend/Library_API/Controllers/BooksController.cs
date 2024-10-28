@@ -70,7 +70,7 @@ namespace Library_API.Controllers
                 return Ok(response);
         }
         [Authorize]
-        [HttpGet("GetBookByIspn")]
+        [HttpGet("GetBookByIsbn")]
         public async Task<ActionResult<BooksResponse>> GetBookByISBN(int isbn)
         {
                 var book = await _getBookByIsbnUseCase.ExecuteAsync(isbn);

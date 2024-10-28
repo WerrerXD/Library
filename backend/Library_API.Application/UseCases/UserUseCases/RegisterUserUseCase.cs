@@ -8,12 +8,13 @@ namespace Library_API.Application.UseCases.UserUseCases
 {
     public class RegisterUserUseCase : IRegisterUserUseCase
     {
-        private readonly IUsersRepository _usersRepository;
         private readonly IPasswordHasher _passwordHasher;
 
-        public RegisterUserUseCase(IUsersRepository usersRepository, IPasswordHasher passwordHasher)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public RegisterUserUseCase(IUnitOfWork unitofwork, IPasswordHasher passwordHasher)
         {
-            _usersRepository = usersRepository;
+            _unitOfWork = unitofwork;
             _passwordHasher = passwordHasher;
         }
 
@@ -21,17 +22,17 @@ namespace Library_API.Application.UseCases.UserUseCases
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(userName))
                 throw new BadRequestException("User data can not be empty");
-            var testUser = await _usersRepository.GetByEmail(email);
+            var testUser = await _unitOfWork.UsersRepository.GetByEmail(email);
             if (testUser != null)
             {
                 throw new AlreadyExistsException("User with this email already exists"); 
             }
             var hashedPassword = _passwordHasher.Generate(password);
 
-            var user = User.Create(Guid.NewGuid(), userName, hashedPassword, email);
+            var user = new User(Guid.NewGuid(), userName, hashedPassword, email);
 
-            await _usersRepository.Create(user);
-            await _usersRepository.Save();
+            await _unitOfWork.UsersRepository.Create(user);
+            await _unitOfWork.Save();
         }
     }
 }

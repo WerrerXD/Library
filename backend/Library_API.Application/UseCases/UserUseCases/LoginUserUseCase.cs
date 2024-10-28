@@ -1,4 +1,5 @@
-﻿using Library_API.Application.Exceptions;
+﻿using Library_API.Application.Contracts;
+using Library_API.Application.Exceptions;
 using Library_API.Application.Interfaces;
 using Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces;
 using Library_API.Core.Abstractions;
@@ -13,22 +14,24 @@ namespace Library_API.Application.UseCases.UserUseCases
 {
     public class LoginUserUseCase : ILoginUserUseCase
     {
-        private readonly IUsersRepository _usersRepository;
+
         private readonly IJwtProvider _jwtProvider;
         private readonly IPasswordHasher _passwordHasher;
 
-        public LoginUserUseCase(IUsersRepository usersRepository, IJwtProvider jwtProvider, IPasswordHasher passwordHasher)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public LoginUserUseCase(IUnitOfWork unitofwork, IPasswordHasher passwordHasher, IJwtProvider jwtProvider)
         {
-            _usersRepository = usersRepository;
-            _jwtProvider = jwtProvider;
+            _unitOfWork = unitofwork;
             _passwordHasher = passwordHasher;
+            _jwtProvider = jwtProvider;
         }
 
         public async Task<string> ExecuteAsync(string email, string password)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 throw new BadRequestException("User data can not be empty");
-            var user = await _usersRepository.GetByEmail(email)?? throw new NotFoundException("User does not exist");
+            var user = await _unitOfWork.UsersRepository.GetByEmail(email)?? throw new NotFoundException("User does not exist");
 
             var result = _passwordHasher.Verify(password, user.PasswordHash);
 
@@ -36,10 +39,23 @@ namespace Library_API.Application.UseCases.UserUseCases
             {
                 throw new UnauthorizedException("Wrong password");
             }
+           
+            var jwtToken = _jwtProvider.GenerateToken(user);
+            var refreshToken = _jwtProvider.GenerateRefreshToken();
+            
 
-            var token = _jwtProvider.GenerateToken(user);
+            RefreshTokenModel refreshTokenModel = new()
+            {
+                Id = Guid.NewGuid(),
+                RefreshToken = refreshToken,
+                UserId = user.Id,
+                Expiration = DateTime.UtcNow.AddDays(1)
+            };
 
-            return token;
+            await _unitOfWork.RefreshTokensRepository.Create(refreshTokenModel);
+            await _unitOfWork.Save();
+
+            return jwtToken;
         }
     }
 }

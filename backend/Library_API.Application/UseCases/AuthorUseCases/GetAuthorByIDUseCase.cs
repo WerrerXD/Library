@@ -13,16 +13,16 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 
     public class GetAuthorByIdUseCase : IGetAuthorByIdUseCase
     {
-        private readonly IAuthorsRepository _authorsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetAuthorByIdUseCase(IAuthorsRepository authorsRepository)
+        public GetAuthorByIdUseCase(IUnitOfWork unitofwork)
         {
-            _authorsRepository = authorsRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task<Author?> ExecuteAsync(Guid id)
         {
-            var author = await _authorsRepository.GetById(id) ?? throw new NotFoundException("Author does not exist");
+            var author = await _unitOfWork.AuthorsRepository.GetById(id) ?? throw new NotFoundException("Author does not exist");
             return author;
         }
     }

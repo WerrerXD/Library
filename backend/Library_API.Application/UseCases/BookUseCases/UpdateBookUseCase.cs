@@ -12,30 +12,34 @@ namespace Library_API.Application.UseCases.BookUseCases
 {
     public class UpdateBookUseCase : IUpdateBookUseCase
     {
-        private readonly IBooksRepository _booksRepository;
-        private readonly IAuthorsRepository _authorsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateBookUseCase(IBooksRepository booksRepository, IAuthorsRepository authorsRepository)
+        public UpdateBookUseCase(IUnitOfWork unitofwork)
         {
-            _booksRepository = booksRepository;
-            _authorsRepository = authorsRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task ExecuteAsync(Book book)
         {
-            bool isExist = await _booksRepository.IsExist(book.Id);
+            bool isExist = await _unitOfWork.BooksRepository.IsExist(book.Id);
             if (!isExist)
             {
                 throw new NotFoundException("Book does not exist");
             }
-            isExist = await _authorsRepository.IsExist(book.AuthorId);
+            var testbook = await _unitOfWork.BooksRepository.GetByISBN(book.ISBN);
+            var count = await _unitOfWork.BooksRepository.GetCountByISBN(book.ISBN);
+            if (count > 1 || (count == 1 && testbook.Id != book.Id))
+            {
+                throw new AlreadyExistsException("Book with this isbn already exists");
+            }
+            isExist = await _unitOfWork.AuthorsRepository.IsExist(book.AuthorId);
             if (!isExist)
             {
                 throw new NotFoundException("Author does not exist");
             }
 
-            await _booksRepository.Update(book);
-            await _booksRepository.Save();
+            await _unitOfWork.BooksRepository.Update(book);
+            await _unitOfWork.Save();
         }
     }
 }

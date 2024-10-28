@@ -12,23 +12,23 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 {
     public class CreateAuthorUseCase : ICreateAuthorUseCase
     {
-        private readonly IAuthorsRepository _authorsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateAuthorUseCase(IAuthorsRepository authorsRepository)
+        public CreateAuthorUseCase(IUnitOfWork unitofwork)
         {
-            _authorsRepository = authorsRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task<Guid> ExecuteAsync(Author author)
         {
-            bool isExist = await _authorsRepository.IsExistByName(author.UserName, author.LastName);
+            bool isExist = await _unitOfWork.AuthorsRepository.IsExistByName(author.UserName, author.LastName);
             if (isExist)
             {
                 throw new AlreadyExistsException("Author already exists");
             }
 
-            var id =  await _authorsRepository.Create(author);
-            await _authorsRepository.Save();
+            var id =  await _unitOfWork.AuthorsRepository.Create(author);
+            await _unitOfWork.Save();
             return id;
         }
     }

@@ -12,16 +12,16 @@ namespace Library_API.Application.UseCases.BookUseCases
 {
     public class GetBookByIsbnUseCase : IGetBookByIsbnUseCase
     {
-        private readonly IBooksRepository _booksRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetBookByIsbnUseCase(IBooksRepository booksRepository)
+        public GetBookByIsbnUseCase(IUnitOfWork unitofwork)
         {
-            _booksRepository = booksRepository;
+            _unitOfWork = unitofwork;
         }
 
-        public async Task<Book> ExecuteAsync(int isbn)
+        public async Task<Book> ExecuteAsync(double isbn)
         {
-            var book = await _booksRepository.GetByISBN(isbn)?? throw new NotFoundException("Book does not exist");
+            var book = await _unitOfWork.BooksRepository.GetByISBN(isbn)?? throw new NotFoundException("Book does not exist");
             return book;
         }
     }

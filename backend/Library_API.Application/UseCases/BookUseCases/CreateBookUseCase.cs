@@ -12,29 +12,32 @@ namespace Library_API.Application.UseCases.BookUseCases
 {
     public class CreateBookUseCase : ICreateBookUseCase
     {
-        private readonly IBooksRepository _booksRepository;
-        private readonly IAuthorsRepository _authorsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateBookUseCase(IBooksRepository booksRepository, IAuthorsRepository authorsRepository)
+        public CreateBookUseCase(IUnitOfWork unitofwork)
         {
-            _booksRepository = booksRepository;
-            _authorsRepository = authorsRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task<Guid> ExecuteAsync(Book book)
         {
-            bool isExist = await _booksRepository.IsExistByTitleAuthor(book.Title, book.AuthorName);
+            bool isExist = await _unitOfWork.BooksRepository.IsExistByTitleAuthor(book.Title, book.AuthorName);
             if (isExist)
             {
-                throw new AlreadyExistsException("Book already exists");
+                throw new AlreadyExistsException("Book with this title and author already exists");
             }
-            isExist = await _authorsRepository.IsExist(book.AuthorId);
+            isExist = await _unitOfWork.BooksRepository.IsExistByIsbn(book.ISBN);
+            if (isExist)
+            {
+                throw new AlreadyExistsException("Book with this isbn already exists");
+            }
+            isExist = await _unitOfWork.AuthorsRepository.IsExist(book.AuthorId);
             if (!isExist)
             {
                 throw new NotFoundException("Author does not exist");
             }
-            var id =  await _booksRepository.Create2(book, book.AuthorId);
-            await _booksRepository.Save();
+            var id =  await _unitOfWork.BooksRepository.Create(book);
+            await _unitOfWork.Save();
             return id;
         }
     }

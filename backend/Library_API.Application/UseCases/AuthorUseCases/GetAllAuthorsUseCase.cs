@@ -11,16 +11,16 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 {
     public class GetAllAuthorsUseCase: IGetAllAuthorsUseCase
     {
-        private readonly IAuthorsRepository _authorsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetAllAuthorsUseCase(IAuthorsRepository authorsRepository)
+        public GetAllAuthorsUseCase(IUnitOfWork unitofwork)
         {
-            _authorsRepository = authorsRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task<List<Author>> ExecuteAsync()
         {
-            return await _authorsRepository.GetAll();
+            return await _unitOfWork.AuthorsRepository.GetAll();
         }
     }
 }

@@ -12,23 +12,23 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 {
     public class DeleteAuthorUseCase : IDeleteAuthorUseCase
     {
-        private readonly IAuthorsRepository _authorsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteAuthorUseCase(IAuthorsRepository authorsRepository)
+        public DeleteAuthorUseCase(IUnitOfWork unitofwork)
         {
-            _authorsRepository = authorsRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task ExecuteAsync(Guid id)
         {
-            bool isExist = await _authorsRepository.IsExist(id);
+            bool isExist = await _unitOfWork.AuthorsRepository.IsExist(id);
             if (!isExist)
             {
                 throw new NotFoundException("Author does not exist");
             }
-            var author = await _authorsRepository.GetById(id);
-            await _authorsRepository.Delete(author);
-            await _authorsRepository.Save();
+            var author = await _unitOfWork.AuthorsRepository.GetById(id);
+            await _unitOfWork.AuthorsRepository.Delete(author);
+            await _unitOfWork.Save();
         }
     }
 }

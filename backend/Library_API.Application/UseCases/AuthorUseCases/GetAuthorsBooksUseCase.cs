@@ -12,21 +12,21 @@ namespace Library_API.Application.UseCases.AuthorUseCases
 {
     public class GetAuthorsBooksUseCase : IGetAuthorsBooksUseCase
     {
-        private readonly IAuthorsRepository _authorsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetAuthorsBooksUseCase(IAuthorsRepository authorsRepository)
+        public GetAuthorsBooksUseCase(IUnitOfWork unitofwork)
         {
-            _authorsRepository = authorsRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task<List<Book>> ExecuteAsync(string Name, string LastName)
         {
-            bool isExist = await _authorsRepository.IsExistByName(Name, LastName);
+            bool isExist = await _unitOfWork.AuthorsRepository.IsExistByName(Name, LastName);
             if (!isExist)
             {
                 throw new NotFoundException("Author does not exist");
             }
-            var books = await _authorsRepository.GetBooks(Name, LastName);
+            var books = await _unitOfWork.AuthorsRepository.GetBooks(Name, LastName);
             return books;
         }
     }

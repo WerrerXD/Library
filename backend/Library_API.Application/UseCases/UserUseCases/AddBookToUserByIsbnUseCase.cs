@@ -12,20 +12,18 @@ namespace Library_API.Application.UseCases.UserUseCases
 {
     public class AddBookToUserByIsbnUseCase : IAddBookToUserByIsbnUseCase
     {
-        private readonly IUsersRepository _usersRepository;
-        private readonly IBooksRepository _booksRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AddBookToUserByIsbnUseCase(IUsersRepository usersRepository, IBooksRepository booksRepository)
+        public AddBookToUserByIsbnUseCase(IUnitOfWork unitofwork)
         {
-            _usersRepository = usersRepository;
-            _booksRepository = booksRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task ExecuteAsync(int isbn, string email)
         {
-            _ = await _usersRepository.GetByEmail(email) ?? throw new NotFoundException("User does not exist");
-            _ = await _booksRepository.GetByISBN(isbn) ?? throw new NotFoundException("Book does not exist");
-            var count = await _usersRepository.AddBookByISBN(isbn, email);
+            _ = await _unitOfWork.UsersRepository.GetByEmail(email) ?? throw new NotFoundException("User does not exist");
+            _ = await _unitOfWork.BooksRepository.GetByISBN(isbn) ?? throw new NotFoundException("Book does not exist");
+            var count = await _unitOfWork.UsersRepository.AddBookByISBN(isbn, email);
             if (count == 0)
             {
                 throw new NotFoundException("Book that you are looking for is taken");

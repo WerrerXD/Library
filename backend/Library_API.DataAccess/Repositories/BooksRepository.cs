@@ -11,7 +11,7 @@ namespace Library_API.DataAccess.Repositories
         {
         }
 
-        public async Task<Book> GetByISBN(int isbn)
+        public async Task<Book> GetByISBN(double isbn)
         {
             var book = await _context.Books
                 .AsNoTracking()
@@ -19,9 +19,9 @@ namespace Library_API.DataAccess.Repositories
             return book;
         }
 
-        public async Task<Guid> Create2(Book book, Guid authorid)
+        public async Task<Guid> Create(Book book)
         {
-            var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == authorid);
+            var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == book.AuthorId);
 
             author?.AuthorBooks.Add(book);
 
@@ -33,6 +33,20 @@ namespace Library_API.DataAccess.Repositories
         public async Task<bool> IsExistByTitleAuthor(string Title, string LastName)
         {
             return await _context.Books.AnyAsync(a => a.Title == Title && a.AuthorName == LastName);
+        }
+
+        public async Task<bool> IsExistByIsbn(double isbn)
+        {
+            return await _context.Books.AnyAsync(a => a.ISBN == isbn);
+        }
+
+        public async Task<int> GetCountByISBN(double isbn)
+        {
+            var books = await _context.Books
+                .AsNoTracking()
+                .Where(b => b.ISBN == isbn)
+                .ToListAsync();
+            return books.Count;
         }
 
         //public async Task<List<Book>> GetByPage(int page, int pageSize)

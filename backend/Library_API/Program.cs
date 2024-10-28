@@ -6,6 +6,7 @@ using Library_API.AuthorizeRequirements.Handlers;
 using Library_API.Core.Abstractions;
 using Library_API.DataAccess;
 using Library_API.DataAccess.Repositories;
+using Library_API.DataAccess.UnitOfWork;
 using Library_API.Extensions;
 using Library_API.Infrastructure;
 using Library_API.Middleware;
@@ -44,12 +45,14 @@ builder.Services.AddUseCases();
 builder.Services.AddScoped<IBooksRepository, BooksRepository>();
 builder.Services.AddScoped<IAuthorsRepository, AuthorsRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IRefreshTokensRepository, RefreshTokensRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IBookCoverService, BookCoverService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
 builder.Services.AddSwaggerGen(options =>
@@ -65,11 +68,15 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 
@@ -82,6 +89,8 @@ app.UseCookiePolicy(new CookiePolicyOptions
 
 
 app.UseRouting();
+
+app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseAuthentication();
 

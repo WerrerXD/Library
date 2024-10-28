@@ -4,6 +4,6 @@ namespace Library_API.Application.UseCases.BookUseCases.BooksUseCasesInterfaces
 {
     public interface IGetBookByIsbnUseCase
     {
-        Task<Book> ExecuteAsync(int isbn);
+        Task<Book> ExecuteAsync(double isbn);
     }
 }

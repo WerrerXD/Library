@@ -11,16 +11,16 @@ namespace Library_API.Application.UseCases.BookUseCases
 {
     public class GetAllBooksUseCase : IGetAllBooksUseCase
     {
-        private readonly IBooksRepository _booksRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetAllBooksUseCase(IBooksRepository booksRepository)
+        public GetAllBooksUseCase(IUnitOfWork unitofwork)
         {
-            _booksRepository = booksRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task<List<Book>> ExecuteAsync()
         {
-            return await _booksRepository.GetAll();
+            return await _unitOfWork.BooksRepository.GetAll();
         }
     }
 }

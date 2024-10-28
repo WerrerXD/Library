@@ -39,7 +39,8 @@ namespace Library_API.Extensions
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(jwtOptions!.SecretKey))
+                            Encoding.UTF8.GetBytes(jwtOptions!.SecretKey)),
+                        ClockSkew = TimeSpan.Zero
                     };
 
                     options.Events = new JwtBearerEvents()
@@ -83,6 +84,7 @@ namespace Library_API.Extensions
             services.AddScoped<IGetUserBooksUseCase, GetUserBooksUseCase>();
             services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
             services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+            services.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
 
         }
     }

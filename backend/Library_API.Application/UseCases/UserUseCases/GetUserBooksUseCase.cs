@@ -12,17 +12,17 @@ namespace Library_API.Application.UseCases.UserUseCases
 {
     public class GetUserBooksUseCase : IGetUserBooksUseCase
     {
-        private readonly IUsersRepository _usersRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetUserBooksUseCase(IUsersRepository usersRepository)
+        public GetUserBooksUseCase(IUnitOfWork unitofwork)
         {
-            _usersRepository = usersRepository;
+            _unitOfWork = unitofwork;
         }
 
         public async Task<List<Book>> ExecuteAsync(string email)
         {
-            _ = await _usersRepository.GetByEmail(email) ?? throw new NotFoundException("User does not exist");
-            return await _usersRepository.GetBooks(email);
+            _ = await _unitOfWork.UsersRepository.GetByEmail(email) ?? throw new NotFoundException("User does not exist");
+            return await _unitOfWork.UsersRepository.GetBooks(email);
         }
     }
 }

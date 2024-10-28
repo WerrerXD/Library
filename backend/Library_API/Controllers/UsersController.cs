@@ -18,6 +18,7 @@ namespace Library_API.Controllers
         private readonly IGetUserBooksUseCase _getUserBooksUseCase;
         private readonly ILoginUserUseCase _loginUserUseCase;
         private readonly IRegisterUserUseCase _registerUserUseCase;
+        private readonly IRefreshTokenUseCase _refreshTokenUseCase;
 
         private readonly IMapper _mapper;
         public UsersController(
@@ -26,7 +27,8 @@ namespace Library_API.Controllers
                                IAddBookToUserByTitleAuthorUseCase addBookToUserByTitleAuthorUseCase,
                                IGetUserBooksUseCase getUserBooksUseCase,
                                ILoginUserUseCase loginUserUseCase,
-                               IRegisterUserUseCase registerUserUseCase)
+                               IRegisterUserUseCase registerUserUseCase,
+                               IRefreshTokenUseCase refreshTokenUseCase)
         {
             _mapper = mapper;
             _addBookToUserByIsbnUseCase = addBookToUserByIsbnUseCase;
@@ -34,6 +36,7 @@ namespace Library_API.Controllers
             _getUserBooksUseCase = getUserBooksUseCase;
             _loginUserUseCase = loginUserUseCase;
             _registerUserUseCase = registerUserUseCase;
+            _refreshTokenUseCase = refreshTokenUseCase;
         }
 
         [HttpPost("Register")]
@@ -49,18 +52,43 @@ namespace Library_API.Controllers
         public async Task<ActionResult> Login([FromBody]LoginUserRequest request)
         {
 
-                var token = await _loginUserUseCase.ExecuteAsync(request.Email, request.Password);
+                var jwtToken = await _loginUserUseCase.ExecuteAsync(request.Email, request.Password);
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    Expires = DateTime.UtcNow.AddDays(1)
+                };
 
-                HttpContext.Response.Cookies.Append("tasty-cookies", token);
+                HttpContext.Response.Cookies.Append("tasty-cookies", jwtToken, cookieOptions);
 
                 if (request.Email == "adminmail")
-                    HttpContext.Response.Cookies.Append("IsAdmin", "Yes");
+                    HttpContext.Response.Cookies.Append("IsAdmin", "Yes", cookieOptions);
                 else
-                    HttpContext.Response.Cookies.Append("IsAdmin", "No");
+                    HttpContext.Response.Cookies.Append("IsAdmin", "No", cookieOptions);
 
-                HttpContext.Response.Cookies.Append("UserEmail", request.Email);
+                HttpContext.Response.Cookies.Append("UserEmail", request.Email, cookieOptions);
 
                 return Ok();
+
+        }
+
+        [HttpPost("RefreshToken")]
+        public async Task<ActionResult> RefreshToken()
+        {
+            var email = HttpContext.Request.Cookies["UserEmail"];
+            var jwtToken = await _refreshTokenUseCase.ExecuteAsync(email);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = DateTime.UtcNow.AddDays(1)
+            };
+            HttpContext.Response.Cookies.Delete("tasty-cookies");
+            HttpContext.Response.Cookies.Append("tasty-cookies", jwtToken, cookieOptions);
+
+            return Ok();
+
         }
 
         [Authorize]

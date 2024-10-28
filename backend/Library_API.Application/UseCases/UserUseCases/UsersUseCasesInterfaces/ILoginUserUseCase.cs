@@ -1,4 +1,6 @@
-﻿namespace Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces
+﻿using Library_API.Application.Contracts;
+
+namespace Library_API.Application.UseCases.UserUseCases.UsersUseCasesInterfaces
 {
     public interface ILoginUserUseCase
     {

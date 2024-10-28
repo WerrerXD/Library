@@ -17,12 +17,6 @@ namespace Library_API.DataAccess.Repositories
         {
             _context = context;
         }
-
-        public async Task Save()
-        {
-            await _context.SaveChangesAsync();
-        }
-
         public async Task<T> GetById(Guid id)
         {
             return await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
